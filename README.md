@@ -119,6 +119,12 @@ var list = conn.QuerySet<UserInfo>()
     .Select(u => new UserInfo() { UserID = u.UserID, Email = u.Email + "mail", CreatedTime = DateTime.Now })
     .ToList();
 
+// 分页查询
+var page = conn.QuerySet<UserInfo>()
+    .Where(u => u.CreatedTime < DateTime.Now)
+    .OrderBy(u => u.UserID)
+    .PageList(1, 10);
+
 // 聚合查询
 int count = conn.QuerySet<UserInfo>().Count();
 int sum = conn.QuerySet<UserInfo>().Where(u => u.CreatedTime < DateTime.Now).Sum(u => u.UserID);

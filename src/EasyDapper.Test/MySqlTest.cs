@@ -54,13 +54,14 @@ public class MySqlTest
                 .Where(n => n.CreatedTime < DateTime.Now)
                 .OrderBy(n => n.UserID)
                 .Select(n => new UserInfo() { UserID = n.UserID, Email = n.Email + "mail", CreatedTime = DateTime.Now })
-                .ToList();
+                .PageList(1, 4);
+
 
             var sum = connection.QuerySet<UserInfo>()
                 .Where(n => n.CreatedTime < DateTime.Now)
                 .Sum(n => n.UserID);
 
-            var userid = list.First().UserID;
+            var userid = list.Items.First().UserID;
 
             // Update the email of the user with the specified UserID
             var num = connection.CommandSet<UserInfo>()
