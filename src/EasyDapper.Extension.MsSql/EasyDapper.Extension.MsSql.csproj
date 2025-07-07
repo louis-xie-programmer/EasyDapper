@@ -4,7 +4,23 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<Title>EasyDapper.Extension.MsSql</Title>
+	<Description>EasyDapper 是一个基于 Dapper 的 .NET 6 ORM 扩展库，专注于 SQL Server (MsSql) 和 MySQL 数据访问优化，支持表达式查询、分页聚合、批量操作等强大功能。</Description>
+	<Authors>louis-xie</Authors>
+	<Company>EasyMs</Company>
+	<PackageId>EasyDapper.Extension.MsSql</PackageId>
+	<PackageVersion>1.0.0</PackageVersion>
+	<PackageIcon>EasyMs.png</PackageIcon>
+	<RepositoryUrl>https://github.com/louis-xie-programmer/EasyDapper.git</RepositoryUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+	<None Include="..\..\EasyMs.png">
+		<Pack>True</Pack>
+		<PackagePath>\</PackagePath>
+	</None>
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>3</WarningLevel>

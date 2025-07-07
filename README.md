@@ -22,6 +22,25 @@ EasyDapper 是一个基于 Dapper 的 .NET 6 ORM 扩展库，专注于 SQL Serve
 
 ## 安装
 
+当前最新版本：
+- EasyDapper.Extension.MsSql 1.0.0
+- EasyDapper.Extension.MySql 1.0.0
+
+### 通过NuGet安装
+
+推荐使用NuGet包管理器进行安装：
+
+#### MsSQL 版本
+```
+Install-Package EasyDapper.Extension.MsSql -Version 1.0.0
+```
+
+#### MySQL 版本
+```
+Install-Package EasyDapper.Extension.MySql -Version 1.0.0
+```
+
+### 从源码编译
 1. 下载源码
 2. 使用 Visual Studio 2022 打开解决方案即可运行
 3. 依赖项
