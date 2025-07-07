@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.4.5 
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=easymysql
+    volumes:
+      - ./data/mysql/log:/data/mysql/log
+      - ./data/mysql/data:/data/mysql/data
+      - ./data/mysql/conf.d:/data/mysql/conf.d
+      - ./data/mysql/documents:/data/mysql/documents
+    ports:
+      - 13306:3306
+    restart: always

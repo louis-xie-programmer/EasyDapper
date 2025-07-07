@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EasyDapper.Extension.MsSql\EasyDapper.Extension.MsSql.csproj" />
+    <ProjectReference Include="..\EasyDapper.Extension.MySql\EasyDapper.Extension.MySql.csproj" />
   </ItemGroup>
 
 </Project>

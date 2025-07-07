@@ -1,76 +1,128 @@
 # EasyDapper
 
-EasyDapper ÊÇÒ»¸ö»ùÓÚ Dapper µÄ .NET 6 ORM À©Õ¹£¬×¨×¢ÓÚ¼ò»¯ SQL Server (MsSql) µÄÊı¾İ·ÃÎÊ£¬Ö§³ÖÁ´Ê½±í´ïÊ½¡¢ÅúÁ¿²Ù×÷¡¢·ÖÒ³¡¢ÊÂÎñµÈ³£ÓÃ¹¦ÄÜ¡£
+EasyDapper æ˜¯ä¸€ä¸ªåŸºäº Dapper çš„ .NET 6 ORM æ‰©å±•åº“ï¼Œä¸“æ³¨äº SQL Server (MsSql) å’Œ MySQL æ•°æ®è®¿é—®ä¼˜åŒ–ï¼Œæ”¯æŒè¡¨è¾¾å¼æŸ¥è¯¢ã€åˆ†é¡µèšåˆã€æ‰¹é‡æ“ä½œç­‰å¼ºå¤§åŠŸèƒ½ã€‚
 
-## Ä¿Â¼½á¹¹
+## ç›®å½•ç»“æ„
 
-- `src/EasyDapper`£ºDapper Ô´Âë¸±±¾£¨¼æÈİĞÔ/À©Õ¹ÓÃ£©
-- `src/EasyDapper.Extension`£ºEasyDapper ºËĞÄÀ©Õ¹£¬°üº¬±í´ïÊ½½âÎö¡¢Á´Ê½ API¡¢·ÖÒ³¡¢¾ÛºÏµÈ
-- `src/EasyDapper.Extension.MsSql`£ºMsSql ×¨ÓÃÊµÏÖÓëÀ©Õ¹
-- `src/EasyDapper.Test`£ºµ¥Ôª²âÊÔÓëÓÃÀı
+- `src/EasyDapper`: Dapper æºç å‰¯æœ¬åŠåŸºç¡€æ‰©å±•
+- `src/EasyDapper.Extension`: EasyDapper æ ¸å¿ƒæ‰©å±•ï¼ŒåŒ…å«è¡¨è¾¾å¼ API å®ç°
+- `src/EasyDapper.Extension.MsSql`: MsSql ä¸“ç”¨å®ç°çš„æ‰©å±•
+- `src/EasyDapper.Extension.MySql`: MySQL ä¸“ç”¨å®ç°çš„æ‰©å±•
+- `src/EasyDapper.Test`: å•å…ƒæµ‹è¯•ä»£ç ï¼ˆåŒ…å« MsSQL å’Œ MySQL æµ‹è¯•æ¡ˆä¾‹ï¼‰
 
-## Ö÷ÒªÌØĞÔ
+## ä¸»è¦ç‰¹æ€§
 
-- »ùÓÚ Dapper£¬ĞÔÄÜÓÅÔ½
-- Ö§³Ö±í´ïÊ½Ê÷Ìõ¼ş²éÑ¯¡¢Á´Ê½µ÷ÓÃ
-- Ö§³Ö·ÖÒ³¡¢¾ÛºÏ¡¢·Ö×é¡¢ÅÅĞò
-- Ö§³ÖÅúÁ¿²åÈë£¨BulkCopy£©
-- Ö§³ÖÊÂÎñ
-- Ö§³ÖÒì²½²Ù×÷
-- Ö§³Ö MsSql ÌØĞÔ£¨Èç WITH(NOLOCK)£©
+- åŸºäºè¡¨è¾¾å¼çš„å¼ºç±»å‹æŸ¥è¯¢
+- æ”¯æŒåˆ†é¡µã€èšåˆã€æ’åº
+- æ”¯æŒæ‰¹é‡æ“ä½œ(BulkCopy)
+- æ”¯æŒäº‹åŠ¡
+- æ”¯æŒå¼‚æ­¥æ“ä½œ
+- æä¾› MsSql ç‰¹æ€§æ”¯æŒï¼Œå¦‚ WITH(NOLOCK)
+- å®Œæ•´çš„å•å…ƒæµ‹è¯•è¦†ç›–
 
-## °²×°
+## å®‰è£…
 
-1. ¿ËÂ¡±¾²Ö¿â
-2. ÓÃ Visual Studio 2022 »òÒÔÉÏ°æ±¾´ò¿ª½â¾ö·½°¸£¬±àÒë¼´¿É
-3. ÒÀÀµ°ü£º
+1. ä¸‹è½½æºç 
+2. ä½¿ç”¨ Visual Studio 2022 æ‰“å¼€è§£å†³æ–¹æ¡ˆå³å¯è¿è¡Œ
+3. ä¾èµ–é¡¹
    - Dapper
-   - Microsoft.Data.SqlClient
+   - Microsoft.Data.SqlClient (MsSql)
+   - MySql.Data (MySQL)
    - System.ComponentModel.Annotations
 
-## ¿ìËÙ¿ªÊ¼
+## å¿«é€Ÿå¼€å§‹
 
-### 1. ÅäÖÃÊı¾İ¿âÁ¬½Ó
+### 1. åˆ›å»ºæ•°æ®åº“è¿æ¥
 
+#### MsSQL è¿æ¥
 ```csharp
 using Microsoft.Data.SqlClient;
 var conn = new SqlConnection("Server=...;Database=...;User Id=...;Password=...;Encrypt=False");
 ```
 
-### 2. ²éÑ¯Ê¾Àı
-
+#### MySQL è¿æ¥
 ```csharp
-using EasyDapper.Extension.MsSql;
+using MySql.Data.MySqlClient;
+var conn = new MySqlConnection("Server=localhost;Port=13306;Database=test;User Id=root;Password=easymysql;");
+```
 
-// ²éÑ¯ËùÓĞÓÃ»§
+### 2. æ•°æ®åº“æ“ä½œç¤ºä¾‹
+
+#### è¡¨åˆ›å»ºä¸åˆ é™¤
+```csharp
+// åˆ¤æ–­è¡¨æ˜¯å¦å­˜åœ¨
+bool exists = context.QuerySet<UserInfo>().ExistTable();
+
+// åˆ é™¤è¡¨
+context.CommandSet<UserInfo>().DropTable().Wait();
+
+// åˆ›å»ºè¡¨
+context.CommandSet<UserInfo>().CreateTable().Wait();
+```
+
+#### æ’å…¥æ“ä½œ
+```csharp
+// åˆ›å»ºä¸€ä¸ªç”¨æˆ·ä¿¡æ¯å¯¹è±¡
+var userInfo = new UserInfo()
+{
+    Email = "xxx@gmail.com",
+    Password = "111111"
+};
+
+// æ’å…¥å•ä¸ªç”¨æˆ·
+context.CommandSet<UserInfo>().Insert(userInfo);
+
+// æ‰¹é‡æ’å…¥
+var userInfoList = new List<UserInfo>();
+for (int i = 0; i < 10; i++)
+{
+    userInfoList.Add(new UserInfo()
+    {
+        Email = $"x{i}@qq.com",
+        Password = "111111"
+    });
+}
+context.Context.CommandSet<UserInfo>().InsertAsyncList(userInfoList).Wait();
+
+// æˆ–è€…ä½¿ç”¨ BulkCopy æ–¹æ³•
+context.Context.CommandSet<UserInfo>().BulkCopy(userInfoList, 100);
+```
+
+#### æŸ¥è¯¢æ“ä½œ
+```csharp
+// æŸ¥è¯¢æ‰€æœ‰ç”¨æˆ·
 var users = conn.QuerySet<UserInfo>().ToList();
 
-// Ìõ¼ş²éÑ¯
+// æ¡ä»¶æŸ¥è¯¢
 var list = conn.QuerySet<UserInfo>()
     .Where(u => u.CreatedTime < DateTime.Now)
     .OrderBy(u => u.UserID)
+    .Select(u => new UserInfo() { UserID = u.UserID, Email = u.Email + "mail", CreatedTime = DateTime.Now })
     .ToList();
 
-// ·ÖÒ³²éÑ¯
-var page = conn.QuerySet<UserInfo>().PageList(1, 20);
-
-// ¾ÛºÏ
+// èšåˆæŸ¥è¯¢
 int count = conn.QuerySet<UserInfo>().Count();
+int sum = conn.QuerySet<UserInfo>().Where(u => u.CreatedTime < DateTime.Now).Sum(u => u.UserID);
 bool exists = conn.QuerySet<UserInfo>().Where(u => u.Email == "test@test.com").Exists();
 ```
 
-### 3. ²åÈë/ÅúÁ¿²åÈë
-
+#### æ›´æ–°æ“ä½œ
 ```csharp
-// µ¥Ìõ²åÈë
-conn.CommandSet<UserInfo>().Insert(new UserInfo { ... });
+var userid = list.First().UserID;
 
-// ÅúÁ¿²åÈë
-conn.CommandSet<UserInfo>().BatchInsert(listOfUserInfo);
+// æ›´æ–°æŒ‡å®šIDç”¨æˆ·çš„é‚®ç®±
+var num = context.CommandSet<UserInfo>()
+    .Where(n => n.UserID == userid)
+    .Update(n => new UserInfo() { Email = n.Email + "fffffmail" });
 ```
 
-### 4. ÊÂÎñ
+#### åˆ é™¤æ“ä½œ
+```csharp
+// åˆ é™¤æ‰€æœ‰ç”¨æˆ·
+context.CommandSet<UserInfo>().Where(u => u.UserID > 0).Delete();
+```
 
+### 3. äº‹åŠ¡å¤„ç†
 ```csharp
 conn.Transaction(ctx => {
     ctx.CommandSet<UserInfo>().Insert(new UserInfo { ... });
@@ -78,26 +130,24 @@ conn.Transaction(ctx => {
 });
 ```
 
-## ½ø½×ÓÃ·¨
+## é«˜çº§ç”¨æ³•
 
-- Ö§³ÖÒì²½·½·¨£¨Èç `ToListAsync()`¡¢`InsertAsync()`£©
-- Ö§³Ö±í´ïÊ½Ê÷ Select/GroupBy/Sum
-- Ö§³Ö×Ô¶¨Òå Provider À©Õ¹
+- æ”¯æŒå¼‚æ­¥æ“ä½œï¼Œå¦‚ `ToListAsync()`ã€`InsertAsync()`
+- æ”¯æŒè¡¨è¾¾å¼ Select/GroupBy/Sum
+- æ”¯æŒè‡ªå®šä¹‰ Provider æ‰©å±•
+- æ”¯æŒ WITH(NOLOCK) æŸ¥è¯¢ï¼ˆä»… MsSQLï¼‰
 
-## ÒÀÀµÓë¼æÈİĞÔ
+## æŠ€æœ¯æ ˆ
 
 - .NET 6
 - Dapper
-- Microsoft.Data.SqlClient
+- Microsoft.Data.SqlClient (MsSql)
+- MySql.Data (MySQL)
 
-## ¹±Ï×
+## å‚ä¸è´¡çŒ®
 
-»¶Ó­Ìá½» Issue ºÍ PR¡£
+æ¬¢è¿æäº¤ Issue å’Œ PRã€‚
 
 ## License
 
-±¾ÏîÄ¿×ñÑ­ Apache 2.0 Ğ­Òé£¬Dapper Ïà¹Ø´úÂë×ñÑ­ÆäÔ­Ê¼Ğ­Òé¡£
-
----
-
-ÈçĞèÏêÏ¸ API ËµÃ÷£¬Çë²Î¿¼Ô´Âë×¢ÊÍÓë²âÊÔÓÃÀı¡£
+æœ¬é¡¹ç›®éµå¾ª Apache 2.0 åè®®ï¼ŒDapper ç›¸å…³ä»£ç éµå¾ªåŸå§‹åè®®ã€‚

@@ -2,7 +2,6 @@
 using System.Linq.Expressions;
 using EasyDapper.Extension.Exception;
 using EasyDapper.Extension.Model;
-using EasyDapper.Extension.MsSql.Helper;
 
 namespace EasyDapper.Extension.MsSql
 {
@@ -154,8 +153,6 @@ namespace EasyDapper.Extension.MsSql
             return this;
         }
 
-
-
         /// <summary>
         /// 根据条件删除数据
         /// </summary>
@@ -226,8 +223,6 @@ namespace EasyDapper.Extension.MsSql
         }
 
 
-
-
         public override SqlProvider FormatSum<T>(LambdaExpression lambdaExpression)
         {
             var selectSql = ResolveExpression.ResolveSum(typeof(T).GetProperties(), lambdaExpression);
@@ -270,15 +265,162 @@ namespace EasyDapper.Extension.MsSql
             return this;
         }
 
-        public override SqlProvider ExcuteBulkCopy<T>(IDbConnection conn, IEnumerable<T> list, int timeout)
+        /// <summary>
+        /// 大批量数据插入请使用SqlBulkCopy
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public override SqlProvider ExcuteBulkCopy<T>(IEnumerable<T> list)
         {
-            SqlHelper.BulkCopy(conn, list, timeout);
+            var sqlparams = FormatParams<T>();
+
+            SqlString = $"INSERT INTO {FormatTableName(false)} ({sqlparams}) VALUES";
+
+            var isAppend = false;
+            foreach (var item in list)
+            {
+                var values = FormatInsertListValues<T>(item);
+                if (isAppend)
+                    SqlString += ",";
+                SqlString += $"({values})";
+                isAppend = true;
+            }
+
             return this;
         }
 
-        public override SqlProvider ExcuteBulkCopy(IDbConnection conn, DataTable dt, int timeout)
+        public override SqlProvider FormatCreateTable<T>()
         {
-            SqlHelper.BulkCopy(conn, dt, timeout);
+            var sqlparams = FormatCreateParams<T>();
+
+            SqlString = $"CREATE TABLE {FormatTableName(false)} ({sqlparams})";
+
+            return this;
+        }
+
+        /// <summary>
+        /// MsSql专用类型映射，支持KeyAttribute自动添加主键标识，支持StringLength、可空性、DefaultValue识别。
+        /// 主键为int/long时自动设置为自增（IDENTITY(1,1)）。
+        /// </summary>
+        /// <param name="type">CLR类型</param>
+        /// <param name="property">属性信息</param>
+        /// <returns>数据库字段类型字符串</returns>
+        protected override string MapClrTypeToDbType(Type type, System.Reflection.PropertyInfo property)
+        {
+            string sqlType;
+            // 识别 StringLength 特性
+            var stringLengthAttr = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.StringLengthAttribute), true)
+                .FirstOrDefault() as System.ComponentModel.DataAnnotations.StringLengthAttribute;
+            if (type == typeof(string))
+            {
+                if (stringLengthAttr != null && stringLengthAttr.MaximumLength > 0)
+                    sqlType = $"NVARCHAR({stringLengthAttr.MaximumLength})";
+                else
+                    sqlType = "NVARCHAR(255)";
+            }
+            else if (type == typeof(int) || type == typeof(Int32))
+                sqlType = "INT";
+            else if (type == typeof(long) || type == typeof(Int64))
+                sqlType = "BIGINT";
+            else if (type == typeof(short) || type == typeof(Int16))
+                sqlType = "SMALLINT";
+            else if (type == typeof(byte))
+                sqlType = "TINYINT";
+            else if (type == typeof(bool))
+                sqlType = "BIT";
+            else if (type == typeof(decimal))
+                sqlType = "DECIMAL(18,2)";
+            else if (type == typeof(double))
+                sqlType = "FLOAT";
+            else if (type == typeof(float))
+                sqlType = "REAL";
+            else if (type == typeof(DateTime))
+                sqlType = "DATETIME";
+            else if (type == typeof(Guid))
+                sqlType = "UNIQUEIDENTIFIER";
+            else
+                sqlType = "NVARCHAR(MAX)";
+
+            // 检查是否有KeyAttribute
+            var isKey = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), true).Any();
+            if (isKey)
+            {
+                // 主键为int/long时设置为自增
+                if (type == typeof(int) || type == typeof(Int32) || type == typeof(long) || type == typeof(Int64))
+                {
+                    sqlType += " IDENTITY(1,1)";
+                }
+                sqlType += " PRIMARY KEY";
+                KeyAttributeName = property.Name; // 记录主键属性名
+            }
+
+            // 检查是否可空（string? 为可空，string 为不可为空）
+            bool isNullable;
+            if (type == typeof(string))
+            {
+                isNullable = property.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute")
+                    || Nullable.GetUnderlyingType(property.PropertyType) != null;
+            }
+            else
+            {
+                isNullable = !property.PropertyType.IsValueType || Nullable.GetUnderlyingType(property.PropertyType) != null;
+            }
+
+            // DefaultValue 识别
+            var defaultValueAttr = property.GetCustomAttributes(typeof(System.ComponentModel.DefaultValueAttribute), true)
+                .FirstOrDefault() as System.ComponentModel.DefaultValueAttribute;
+            string defaultValueSql = null;
+            if (defaultValueAttr != null)
+            {
+                if (type == typeof(string))
+                    defaultValueSql = $" DEFAULT '{defaultValueAttr.Value?.ToString().Replace("'", "''")}'";
+                else if (type == typeof(bool))
+                    defaultValueSql = $" DEFAULT {(Convert.ToBoolean(defaultValueAttr.Value) ? 1 : 0)}";
+                else if (type == typeof(DateTime))
+                    defaultValueSql = $" DEFAULT '{((DateTime)defaultValueAttr.Value):yyyy-MM-dd HH:mm:ss}'";
+                else
+                    defaultValueSql = $" DEFAULT {defaultValueAttr.Value}";
+            }
+            // DateTime类型如果不为空且没有DefaultValue，自动设为当前时间
+            if (type == typeof(DateTime) && !isNullable && defaultValueAttr == null)
+            {
+                defaultValueSql = " DEFAULT GETDATE()";
+            }
+
+            if (!isKey) // 主键一般不允许为NULL
+            {
+                sqlType += isNullable ? " NULL" : " NOT NULL";
+            }
+            else
+            {
+                sqlType += " NOT NULL";
+            }
+
+            if (defaultValueSql != null)
+            {
+                sqlType += defaultValueSql;
+            }
+
+            return sqlType;
+        }
+
+        public override SqlProvider FormatExistTable<T>()
+        {
+            var tableName = FormatTableName(false,false);
+
+            SqlString = $"SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{tableName}'";
+
+            return this;
+        }
+
+        public override SqlProvider FormatDropTable<T>()
+        {
+            var tableName = FormatTableName(false);
+
+            SqlString = $"DROP TABLE IF EXISTS {tableName}";
+
             return this;
         }
     }

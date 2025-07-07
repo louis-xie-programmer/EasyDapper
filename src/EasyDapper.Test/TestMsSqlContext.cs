@@ -15,7 +15,7 @@ namespace EasyDapper.Test
             {
                 if (_context == null)
                 {
-                    var ConnectionString = "Server=192.168.127.248;Database=test;User Id=test;Password=test;Encrypt=False";
+                    var ConnectionString = "Server=.;Database=test;User Id=easy;Password=easy;Encrypt=False";
                     _context = new SqlConnection(ConnectionString);
                 }
                 return _context;
